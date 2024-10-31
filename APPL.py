@@ -1,31 +1,39 @@
 import yfinance as yf
 import streamlit as st
 import pandas as pd
+import plotly.graph_objects as go
 
-st.title('Stock Price Evolution')
+st.title("Stock Price Evolution")
 
-# Input for stock symbol
-symbol = st.text_input("Enter Stock Symbol:", "AAPL")
+# Get the stock symbol from the user
+symbol = st.text_input("Enter stock symbol (e.g., AAPL):", "AAPL")
 
-# Input for date range
-start_date = st.date_input("Start Date", pd.to_datetime('2023-01-01'))
-end_date = st.date_input("End Date", pd.to_datetime('today'))
+# Get the start and end dates for the data
+start_date = st.date_input("Start date:", pd.to_datetime("2023-01-01"))
+end_date = st.date_input("End date:", pd.to_datetime("today"))
 
-
-# Fetch data
+# Download the stock data using yfinance
 try:
     data = yf.download(symbol, start=start_date, end=end_date)
-
     if data.empty:
-        st.error(f"No data found for symbol '{symbol}' within the specified date range.")
+        st.error("No data found for the given symbol and dates.")
     else:
-        # Display the data
-        st.write(f"Data for {symbol} from {start_date} to {end_date}")
-        st.dataframe(data[['Open', 'Close']])  # Show only 'Open' and 'Close' columns
+        # Create the candlestick chart
+        fig = go.Figure(data=[go.Candlestick(x=data.index,
+                                            open=data['Open'],
+                                            high=data['High'],
+                                            low=data['Low'],
+                                            close=data['Close'])])
 
+        fig.update_layout(title=f"{symbol} Stock Price",
+                          xaxis_title="Date",
+                          yaxis_title="Price")
 
-        # Plotting
-        st.line_chart(data[['Open', 'Close']])
+        st.plotly_chart(fig)
+
+        # Display the Open and Close prices in a table
+        st.subheader("Open and Close Prices")
+        st.dataframe(data[['Open', 'Close']])
 
 except Exception as e:
     st.error(f"An error occurred: {e}")
