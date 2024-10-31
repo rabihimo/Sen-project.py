@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 st.title("Stock Price Evolution")
 
 # Get the stock symbol from the user
-symbol = st.text_input("Enter stock symbol (e.g., AAPL):", "AAPL")
+symbol = st.text_input("Enter stock symbol :", "AAPL")
 
 # Get the start and end dates for the data
 start_date = st.date_input("Start date:", pd.to_datetime("2023-01-01"))
